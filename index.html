@@ -77,8 +77,8 @@ button:disabled {
 }
 
 @keyframes fall {
-    0% {transform: translateY(-100px) rotate(0deg);}
-    100% {transform: translateY(100vh) rotate(360deg);}
+    0% {transform: translateY(0px) rotate(0deg);}
+    100% {transform: translateY(120vh) rotate(360deg);}
 }
 </style>
 </head>
@@ -137,6 +137,7 @@ function createConfetti() {
     confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
 
     confetti.style.left = Math.random() * window.innerWidth + "px";
+    confetti.style.top = "-20px";
     confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
 
     document.body.appendChild(confetti);
@@ -149,3 +150,4 @@ function createConfetti() {
 
 </body>
 </html>
+
