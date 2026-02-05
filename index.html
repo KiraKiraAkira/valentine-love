@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💖</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.box {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 350px;
+    z-index: 2;
+}
+
+h1 {
+    color: #ff4d6d;
+}
+
+button {
+    padding: 12px 25px;
+    margin: 10px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.yes {
+    background: #ff4d6d;
+    color: white;
+}
+
+.no {
+    background: #555;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#loveMessage {
+    display: none;
+    font-size: 22px;
+    color: #ff1e56;
+    margin-top: 20px;
+}
+
+#warningText {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #ff7b7b;
+}
+
+/* Confetti */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: fall 3s linear infinite;
+}
+
+@keyframes fall {
+    0% {transform: translateY(-100px) rotate(0deg);}
+    100% {transform: translateY(100vh) rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h1>Do you love me? 💘</h1>
+
+    <button class="yes" id="yesBtn" onclick="sayYes()">Yes 💖</button>
+    <button class="no" id="noBtn" onclick="sayNo()">No 💔</button>
+
+    <div id="warningText"></div>
+
+    <div id="loveMessage">
+        I love you sayanggg 💕💖😍❤️🥰💞
+    </div>
+</div>
+
+<script>
+const warnings = [
+    "Are you sure? 😳",
+    "Think again 🤔",
+    "Pleaseee 🥺💔"
+];
+
+let noCount = 0;
+
+function sayYes() {
+    document.getElementById("loveMessage").style.display = "block";
+    document.getElementById("warningText").innerHTML = "";
+
+    // Disable tombol NO
+    document.getElementById("noBtn").disabled = true;
+
+    // Confetti
+    for (let i = 0; i < 80; i++) {
+        createConfetti();
+    }
+}
+
+function sayNo() {
+    const warning = document.getElementById("warningText");
+
+    // Ambil tulisan berdasarkan urutan (muter)
+    warning.innerHTML = warnings[noCount % warnings.length];
+
+    noCount++;
+}
+
+function createConfetti() {
+    const confetti = document.createElement("div");
+    confetti.classList.add("confetti");
+
+    const colors = ["#ff4d6d", "#ffd93d", "#6bcf63", "#4dabf7", "#c77dff"];
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    confetti.style.left = Math.random() * window.innerWidth + "px";
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+
+    document.body.appendChild(confetti);
+
+    setTimeout(() => {
+        confetti.remove();
+    }, 3000);
+}
+</script>
+
+</body>
+</html>
