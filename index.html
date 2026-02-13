@@ -9,12 +9,17 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    height: 100vh;
+    background: linear-gradient(135deg, #ff4d6d, #ffccd5);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    transition: backdrop-filter 0.5s ease;
+}
+
+body.blur {
+    backdrop-filter: blur(5px);
 }
 
 .box {
@@ -25,10 +30,22 @@ body {
     width: 90%;
     max-width: 350px;
     z-index: 2;
+    transition: transform 0.5s ease;
+}
+
+.box.zoom {
+    transform: scale(1.05);
 }
 
 h1 {
     color: #ff4d6d;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #ff4d6d;
+    margin-bottom: 15px;
 }
 
 button {
@@ -40,27 +57,8 @@ button {
     cursor: pointer;
 }
 
-.yes {
-    background: #ff4d6d;
-    color: white;
-}
-
-.no {
-    background: #555;
-    color: white;
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-#loveMessage {
-    display: none;
-    font-size: 22px;
-    color: #ff1e56;
-    margin-top: 20px;
-}
+.yes { background: #ff4d6d; color: white; }
+.no { background: #555; color: white; }
 
 #warningText {
     margin-top: 15px;
@@ -68,86 +66,173 @@ button:disabled {
     color: #ff7b7b;
 }
 
+#loveMessage {
+    display: none;
+    font-size: 15px;
+    color: #ff1e56;
+    margin-top: 20px;
+    max-height: 250px;
+    overflow-y: auto;
+    text-align: left;
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+#surpriseBtn {
+    display: none;
+    margin-top: 15px;
+    background: #ff8fab;
+    color: white;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 14px;
+}
+
+.ps {
+    display: none;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #ff4d6d;
+}
+
 /* Confetti */
 .confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    animation: fall 3s linear infinite;
+    position: fixed;
+    top: -50px;
+    animation: fall linear forwards;
+    pointer-events: none;
+}
+
+/* Floating Hearts */
+.heart {
+    position: fixed;
+    bottom: -20px;
+    animation: floatUp 6s linear forwards;
+    pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .box { padding: 20px; }
+    h1 { font-size: 20px; }
+    button { width: 100%; margin: 8px 0; }
 }
 
 @keyframes fall {
-    0% {transform: translateY(0px) rotate(0deg);}
-    100% {transform: translateY(120vh) rotate(360deg);}
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(360deg); }
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-110vh); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="box" id="mainBox">
     <h1>Do you love me? 💘</h1>
+    <div class="subtitle">For the girl who loves strawberry 🍓💕</div>
 
-    <button class="yes" id="yesBtn" onclick="sayYes()">Yes 💖</button>
-    <button class="no" id="noBtn" onclick="sayNo()">No 💔</button>
+    <button class="yes" onclick="sayYes()">Yes 💖</button>
+    <button class="no" onclick="sayNo()">No 💔</button>
 
     <div id="warningText"></div>
+    <div id="loveMessage"></div>
 
-    <div id="loveMessage">
-        I love you sayanggg 💕💖😍❤️🥰💞
-    </div>
+    <button id="surpriseBtn" onclick="showSurprise()">🍓 Click this strawberry</button>
+    <div class="ps" id="psText">PS: If you ever doubt how much I love you, open this again.</div>
 </div>
 
 <script>
-const warnings = [
-    "Are you sure? 😳",
-    "Think again 🤔",
-    "Pleaseee 🥺💔"
-];
-
+const warnings = ["Are you sure? 😳","Think again 🤔","Pleaseee 🥺💔"];
 let noCount = 0;
 
-function sayYes() {
-    document.getElementById("loveMessage").style.display = "block";
-    document.getElementById("warningText").innerHTML = "";
+const messagePart1 = `You are sweeter than any strawberry in this world 🍓
 
-    // Disable tombol NO
-    document.getElementById("noBtn").disabled = true;
+And loving you feels just as sweet — but deeper and more meaningful.
+You make my heart calm and excited at the same time.
+With you, I feel safe. With you, I feel understood.
+I don’t just want to love you today.
+I want to love you tomorrow, next year, and for the rest of my life.
+I want to grow old with you, build dreams together, and create a life full of laughter and love.`;
 
-    // Confetti
-    for (let i = 0; i < 80; i++) {
-        createConfetti();
+const messageEnding = `
+
+And I want forever… with you, Eni. 💖
+
+I know I haven’t always been the best boyfriend, and for that, I’m truly sorry.
+But I promise I will keep trying to be better every single day.
+I love you, and I will always choose you.`;
+
+function typeEffect(element, text, speed, callback) {
+    let i = 0;
+    function typing() {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typing, speed);
+        } else if (callback) {
+            callback();
+        }
     }
+    typing();
+}
+
+function sayYes() {
+    document.body.classList.add("blur");
+    document.getElementById("mainBox").classList.add("zoom");
+
+    const message = document.getElementById("loveMessage");
+    message.style.display = "block";
+    message.innerHTML = "";
+
+    typeEffect(message, messagePart1, 30, () => {
+        setTimeout(() => {
+            typeEffect(message, messageEnding, 40, () => {
+                document.getElementById("surpriseBtn").style.display = "inline-block";
+                document.getElementById("psText").style.display = "block";
+            });
+        }, 800);
+    });
+
+    for (let i = 0; i < 40; i++) createConfetti();
 }
 
 function sayNo() {
-    const warning = document.getElementById("warningText");
-
-    // Ambil tulisan berdasarkan urutan (muter)
-    warning.innerHTML = warnings[noCount % warnings.length];
-
+    document.getElementById("warningText").innerHTML = warnings[noCount % warnings.length];
     noCount++;
 }
 
 function createConfetti() {
     const confetti = document.createElement("div");
     confetti.classList.add("confetti");
-
-    const colors = ["#ff4d6d", "#ffd93d", "#6bcf63", "#4dabf7", "#c77dff"];
-    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-
+    const items = ["🍓","💖"];
+    confetti.innerHTML = items[Math.floor(Math.random() * items.length)];
+    confetti.style.fontSize = (Math.random() * 15 + 20) + "px";
     confetti.style.left = Math.random() * window.innerWidth + "px";
-    confetti.style.top = "-20px";
     confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
-
     document.body.appendChild(confetti);
-
-    setTimeout(() => {
-        confetti.remove();
-    }, 3000);
+    setTimeout(() => confetti.remove(), 3000);
 }
+
+function showSurprise() {
+    alert("Thank you for choosing me. I’m the luckiest person because I have you. 🍓💖");
+}
+
+/* Floating hearts */
+setInterval(() => {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.fontSize = (Math.random() * 15 + 15) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+}, 1200);
 </script>
 
 </body>
 </html>
-
